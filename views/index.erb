@@ -1,0 +1,47 @@
+<h2>[CHONP] internal <%= @type %> ladder</h2>
+<p>
+<a href='/1v1'>1v1</a>
+<a href='/2v2'>2v2</a>
+<a href='/3v3'>3v3</a>
+<a href='/FFA'>FFA</a>
+</p>
+<table>
+  <tr>
+    <th>Position</th>
+    <th>Player</th>
+    <th>Rank</th>
+    <th>&nbsp;</th>
+    <th>Wins / Losses</th>
+  </tr>
+  <% @ladder.each do |entry| %>
+    <tr>
+    <% if entry[:position].nil? %>
+      <td>-</td>
+    <% else %>
+      <td><%= entry[:position] %></td>
+    <% end %>
+      <td>
+        <a href='/<%= @type %>/<%= entry[:player] %>'><%= entry[:player] %></a>
+      </td>
+    <% if entry[:rank] == 0 %>
+      <td>&nbsp;</td>
+    <% else %>
+      <td><%= entry[:rank] %></td>
+    <% end %>
+    <% if not entry[:change].nil? %>
+      <td><%= erb :pos_neg, :locals => {:change => entry[:change]} %></td>
+    <% else %>
+      <td>&nbsp;</td>
+    <% end %>
+    <% if entry[:percent].nil? %>
+      <% if entry[:wins] == 0 and entry[:losses] == 0 %>
+        <td>No games played</td>
+      <% else %>
+        <td><%= entry[:wins] %>/<%= entry[:losses] %></td>
+      <% end %>
+    <% else %>
+      <td><%= entry[:wins] %>/<%= entry[:losses] %> (<%= entry[:percent] %>%)</td>
+    <% end %>
+    </tr>
+  <% end %>
+</table>

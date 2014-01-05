@@ -1,0 +1,20 @@
+<h2>[CHONP] internal <a href='/<%= @type %>'><%= @type %></a> ladder - matches played by <%= @player.alias %></h2>
+
+<h3><%= @type %> matches played by <%= @player.alias %></h3>
+<table>
+  <tr>
+    <th>Timestamp</th>
+    <th>Map</th>
+    <th>Teams</th>
+    <th>Result</th>
+    <th>Rank</th>
+    <th>Rank change</th>
+  </tr>
+<% @matches.each do |match,change| %>
+  <%= erb :match_row, :locals => {
+    :match  => match,
+    :change => change,
+    :player => @player
+  } %>
+<% end %>
+</table>

@@ -1,0 +1,16 @@
+<%
+  if change[:seeded]
+    prepend = 'seed match'
+    colour = 'blue'
+    change[:diffrank] = ''
+  elsif change[:diffrank] > 0
+    prepend = '+'
+    colour = 'green'
+  elsif change[:diffrank] < 0
+    prepend = ''
+    colour = 'red'
+  else
+    prepend = '&nbsp;'
+    colour = 'blue'
+  end
+%><span style='color:<%= colour %>;'><%= prepend %><%= change[:diffrank] %></span>
