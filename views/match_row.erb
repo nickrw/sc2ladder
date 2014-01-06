@@ -1,25 +1,33 @@
+
+
+
+
+
+
+
 <tr>
   <td>
     <a href='http://ggtracker.com/matches/<%= match.id %>'>
       <%= distance_of_time_in_words_to_now(Time.parse(match.data['ended_at'])).capitalize %> ago
     </a>
   </td>
-  <td><%= h match.map %></td>
-  <td><%= h match.pretty_team %></td>
   <% if not player.nil? %>
     <% if match.won?(player) %>
-      <td><span style='color:green;'>WIN</span></td>
+      <td class='text-success'><strong>WIN</strong></td>
     <% elsif match.lost?(player) %>
-      <td><span style='color:red;'>LOSS</span></td>
+      <td class='text-danger'><strong>LOSS</strong></td>
     <% else %>
-      <td><span style='color:blue;'>DRAW</span></td>
+      <td class='text-info'><strong>DRAW</strong></td>
     <% end %>
     <% if change.nil? %>
       <td>&nbsp;</td>
-      <td>&nbsp;</td>
     <% else %>
-      <td><%= change[:newrank] %></td>
-      <td><%= erb :pos_neg, :locals => {:change => change} %></td>
+      <td>
+        <%= change[:newrank] %>&nbsp;
+        <%= erb :pos_neg, :locals => {:change => change} %>
+      </td>
     <% end %>
   <% end %>
+  <td><%= h match.pretty_team %></td>
+  <td><%= h match.map %></td>
 </tr>

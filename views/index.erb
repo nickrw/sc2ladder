@@ -1,15 +1,11 @@
-<h2>[CHONP] internal <%= @type %> ladder</h2>
-<p>
-<a href='/1v1'>1v1</a>
-<a href='/2v2'>2v2</a>
-<a href='/3v3'>3v3</a>
-<a href='/FFA'>FFA</a>
-</p>
-<table>
+<div class="page-header">
+  <h1>[<%= @settings.teamtag %>] <%= @settings.teamname %> - <%= @type %> ladder</h1>
+</div>
+<table class="table table-striped">
   <tr>
     <th>Position</th>
-    <th>Player</th>
     <th>Rank</th>
+    <th>Player</th>
     <th>&nbsp;</th>
     <th>Wins / Losses</th>
   </tr>
@@ -20,18 +16,21 @@
     <% else %>
       <td><%= entry[:position] %></td>
     <% end %>
-      <td>
-        <a href='/<%= @type %>/<%= entry[:player] %>'><%= entry[:player] %></a>
-      </td>
     <% if entry[:rank] == 0 %>
       <td>&nbsp;</td>
     <% else %>
-      <td><%= entry[:rank] %></td>
+      <td>
+        <%= entry[:rank] %>
     <% end %>
-    <% if not entry[:change].nil? %>
-      <td><%= erb :pos_neg, :locals => {:change => entry[:change]} %></td>
-    <% else %>
-      <td>&nbsp;</td>
+        <% if not entry[:change].nil? %>
+          &nbsp;<%= erb :pos_neg, :locals => {:change => entry[:change]} %>
+        <% end %>
+      </td>
+    <td<%= entry[:player].name == entry[:player].alias ? ' colspan="2"' : '' %>>
+        <a href='/<%= @type %>/<%= entry[:player].name %>'><%= entry[:player].name %></a>
+      </td>
+    <% if entry[:player].name != entry[:player].alias %>
+      <td><%= entry[:player].alias %></td>
     <% end %>
     <% if entry[:percent].nil? %>
       <% if entry[:wins] == 0 and entry[:losses] == 0 %>

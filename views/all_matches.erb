@@ -1,10 +1,11 @@
-<h2>[CHONP] internal <a href='/<%= @type %>'><%= @type %></a> ladder - all matches</h2>
-
-<table>
+<div class="page-header">
+  <h1>[<%= @settings.teamtag %>] <%= @settings.teamname %> - all <%= @type %> ladder matches</h1>
+</div>
+<table class="table table-bordered table-striped">
   <tr>
     <th>Timestamp</th>
-    <th>Map</th>
     <th>Teams</th>
+    <th>Map</th>
   </tr>
 <% @matches.each do |match,change| %>
   <%= erb :match_row, :locals => {

@@ -1,14 +1,13 @@
-<h2>[CHONP] internal <a href='/<%= @type %>'><%= @type %></a> ladder - matches played by <%= @player.alias %></h2>
-
-<h3><%= @type %> matches played by <%= @player.alias %></h3>
-<table>
+<div class="page-header">
+  <h1>[<%= @settings.teamtag %>] <%= full_player_name(@player) %> - <%= @type %> ladder matches</h1>
+</div>
+<table class="table table-striped">
   <tr>
     <th>Timestamp</th>
-    <th>Map</th>
-    <th>Teams</th>
     <th>Result</th>
     <th>Rank</th>
-    <th>Rank change</th>
+    <th>Teams</th>
+    <th>Map</th>
   </tr>
 <% @matches.each do |match,change| %>
   <%= erb :match_row, :locals => {
