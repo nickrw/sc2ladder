@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.email = ['nick@robinson-wall.com']
   s.required_ruby_version = '>= 1.9.2'
   s.executables = ["sc2ladder"]
-  s.files = Dir['{lib,bin,views,public}/**/*']
+  s.files = Dir['{lib,bin,views,public}/**/*'] + ['config.ru']
   s.add_dependency 'sinatra'
   s.add_dependency 'json'
   s.add_dependency 'ggtracker'

@@ -8,7 +8,8 @@ require 'json'
 module SC2Ladder
 
   class SC2Ladder::Settings
-    attr_accessor :types, :teamtag, :teamname, :players
+    attr_accessor :types, :teamtag, :teamname, :players, :blacklist_matches
+    attr_accessor :blacklist_before, :blacklist_after, :blacklist_ranges
     def initialize
       @vardir = File.expand_path(File.join(Dir.home, ".sc2ladder"))
       @file = File.expand_path(File.join(@vardir, "settings.json"))
@@ -19,6 +20,10 @@ module SC2Ladder
       @teamtag = ''
       @teamname = ''
       @players = {}
+      @blacklist_matches = []
+      @blacklist_before = nil
+      @blacklist_after = nil
+      @blacklist_ranges = []
       read
     end
 
@@ -62,6 +67,40 @@ module SC2Ladder
           next if not valid_players?(players_to_be)
           @players = players_to_be
 
+        when "blacklist_matches"
+          @blacklist_matches = []
+          next if val.class != Array
+          val.each do |match_id|
+            @blacklist_matches << match_id.to_i unless match_id.to_i == 0
+          end
+
+        when "blacklist_ranges"
+          @blacklist_ranges = []
+          next if val.class != Array
+          begin
+            @blacklist_ranges = val.map { |x| Time.at(x[0].to_i)..Time.at(x[1].to_i) }
+          rescue
+            next
+          end
+
+        when "blacklist_before"
+          @blacklist_before = nil
+          next if val.nil?
+          begin
+            @blacklist_before = Time.at(val.to_i)
+          rescue
+            next
+          end
+
+        when "blacklist_after"
+          @blacklist_after = nil
+          next if val.nil?
+          begin
+            @blacklist_after = Time.at(val.to_i)
+          rescue
+            next
+          end
+
         end
       end
     end
@@ -87,11 +126,17 @@ module SC2Ladder
     def write
       ensure_file
       p = Hash[@players.map { |player, player_alias| [player.id, player_alias] }]
+      bl_r = @blacklist_ranges.map { |range| [range.first.to_i, range.last.to_i] }
+      bl_m = @blacklist_matches.map { |match| match.id }
       s = {
         "types"    => @types,
         "teamtag"  => @teamtag,
         "teamname" => @teamname,
-        "players"  => p
+        "players"  => p,
+        "blacklist_ranges" => bl_r,
+        "blacklist_before" => @blacklist_before.to_i,
+        "blacklist_after" => @blacklist_after.to_i,
+        "blacklist_matches" => bl_m
       }.to_json
       IO.write(@file, s)
     end
@@ -194,10 +239,8 @@ module SC2Ladder
     get '/:type' do
       redirect to('/1v1') if not @settings.types.include?(params[:type])
       @type = params[:type]
-      chonp = GGTracker::InternalLadder.new(@type, *@settings.players.keys)
-      chonp.blacklist(@blacklist)
-      chonp.automatic
-      @ladder = view_ladder(chonp)
+      ladder = calculate_ladder
+      @ladder = view_ladder(ladder)
       erb :index
     end
 
@@ -210,9 +253,7 @@ module SC2Ladder
         @player = name2id(params[:player])
         redirect to("/#{@type}") if @player.nil?
       end
-      @ladder = GGTracker::InternalLadder.new(@type, *@settings.players.keys)
-      @ladder.blacklist(@blacklist)
-      @ladder.automatic
+      @ladder = calculate_ladder
       @matches = {}
       @ladder.matches.sort.reverse.each do |match|
         if @player.nil?
@@ -231,6 +272,22 @@ module SC2Ladder
     end
 
     private
+
+    def calculate_ladder
+      l = GGTracker::InternalLadder.new(@type, *@settings.players.keys)
+      l.blacklist(@settings.blacklist_matches)
+      if @settings.blacklist_before
+        l.blacklist_before(@settings.blacklist_before)
+      end
+      if @settings.blacklist_after
+        l.blacklist_after(@settings.blacklist_after)
+      end
+      @settings.blacklist_ranges.each do |tr|
+        l.blacklist_time_range(tr)
+      end
+      l.automatic
+      l
+    end
 
     def view_ladder(ladder)
       array = []

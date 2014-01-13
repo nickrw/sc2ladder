@@ -3,6 +3,10 @@
     prepend = 'seed match'
     cclass = 'text-info'
     change[:diffrank] = ''
+  elsif change[:blacklist]
+    prepend = 'ignored'
+    cclass = 'text-info'
+    change[:diffrank] = ''
   elsif change[:diffrank] > 0
     prepend = '+'
     cclass = 'text-success'

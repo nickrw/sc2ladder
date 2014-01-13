@@ -3,37 +3,28 @@ $LOAD_PATH << File.join(File.expand_path(File.dirname(__FILE__)), "..", "lib")
 
 require 'ggtracker'
 require 'ggtracker/internalladder'
+require './lib/sc2ladder'
 
 GGTracker::API.allow_api_calls
 
-$players = {
-  'Nick' => GGTracker::API.identity(1031800),
-  'Kristof' => GGTracker::API.identity(1161842),
-  'Victor' => GGTracker::API.identity(1313010),
-  'James' => GGTracker::API.identity(1364014),
-  'Josh' => GGTracker::API.identity(1391538),
-  'Tiago' => GGTracker::API.identity(1399882),
-  'Chris' => GGTracker::API.identity(1404374),
-  'Rosario' => GGTracker::API.identity(1442802),
-  'Oliver' => GGTracker::API.identity(1399883),
-  'Jesper' => GGTracker::API.identity(1395994)
-}
-$players.each do |name,identity|
-  identity.alias = name
-end
-$team = $players.values
+$settings = SC2Ladder::Settings.new
 
-def compute_ladder(type, players)
-  chonp = GGTracker::InternalLadder.new(type, *players)
-  players.each do |player|
-    GGTracker::API.matches(player.id, false, type).all
+def calculate_ladder(type)
+  l = GGTracker::InternalLadder.new(type, *$settings.players.keys)
+  l.blacklist($settings.blacklist_matches)
+  if $settings.blacklist_before
+    l.blacklist_before($settings.blacklist_before)
   end
-  chonp.automatic
-  chonp
+  if $settings.blacklist_after
+    l.blacklist_after($settings.blacklist_after)
+  end
+  $settings.blacklist_ranges.each do |tr|
+    l.blacklist_time_range(tr)
+  end
+  l.automatic
+  l
 end
 
+calculate_ladder('1v1')
+calculate_ladder('FFA')
 
-compute_ladder('1v1', $team)
-compute_ladder('2v2', $team)
-compute_ladder('3v3', $team)
-compute_ladder('FFA', $team)

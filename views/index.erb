@@ -21,11 +21,11 @@
     <% else %>
       <td>
         <%= entry[:rank] %>
-    <% end %>
         <% if not entry[:change].nil? %>
           &nbsp;<%= erb :pos_neg, :locals => {:change => entry[:change]} %>
         <% end %>
       </td>
+    <% end %>
     <td<%= entry[:player].name == entry[:player].alias ? ' colspan="2"' : '' %>>
         <a href='/<%= @type %>/<%= entry[:player].name %>'><%= entry[:player].name %></a>
       </td>
